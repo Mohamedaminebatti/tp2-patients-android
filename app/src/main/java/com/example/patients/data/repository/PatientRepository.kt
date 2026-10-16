@@ -2,6 +2,7 @@ package com.example.patients.data.repository
 
 import com.example.patients.data.model.ApiError
 import com.example.patients.data.model.Patient
+import com.example.patients.data.model.PatientRequest
 import com.example.patients.data.remote.PatientApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -14,6 +15,17 @@ class PatientRepository(
 ) {
 
     suspend fun getPatients(): Result<List<Patient>> = safeCall { api.getPatients() }
+
+    suspend fun createPatient(request: PatientRequest): Result<Patient> =
+        safeCall { api.createPatient(request) }
+
+    suspend fun updatePatient(id: String, request: PatientRequest): Result<Patient> =
+        safeCall { api.updatePatient(id, request) }
+
+    suspend fun deletePatient(id: String): Result<Unit> = safeCall {
+        val response = api.deletePatient(id)
+        if (!response.isSuccessful) throw HttpException(response)
+    }
 
     // Exécute un appel réseau et transforme toute erreur en message lisible
     private suspend fun <T> safeCall(call: suspend () -> T): Result<T> =
